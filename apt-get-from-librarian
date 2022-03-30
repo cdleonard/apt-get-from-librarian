@@ -6,6 +6,7 @@ print_help()
 {
     cat >&2 <<MSG
 apt-get-from-librarian: Install packages from launchpad librarian
+=================================================================
 
 This tool can install old version of ubuntu packages from launchpad librarian.
 
