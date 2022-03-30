@@ -1,0 +1,8 @@
+image: ubuntu:20.04
+
+test:
+  before_script:
+    - apt-get update
+    - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates
+  script:
+    - ./test.sh
