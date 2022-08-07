@@ -14,6 +14,12 @@ Usage:
 
     # apt-get-from-librarian [<PACKAGE1=VERSION1>...]
 
+Options:
+
+-h, --help                  Show this message.
+-a, --arch ARCH             Set arch (default $opt_arch)
+-d, --distro DISTRO         Set ubuntu distro codename (default $opt_distro)
+
 Example:
 
     # apt-get-from-librarian gcc-9=9.3.0-17ubuntu1~20.04 g++-9=9.3.0-17ubuntu1~20.04
@@ -34,6 +40,47 @@ exit_trap()
     rm -rf "$tmpdir"
 }
 
+parse_args()
+{
+    # Defaults
+    opt_arch=amd64
+    opt_distro=focal
+    opt_pkg_list=()
+
+    if [[ $OSTYPE = darwin* ]]; then
+        if [[ -x /usr/local/opt/gnu-getopt/bin/getopt ]]; then
+            getopt() { /usr/local/opt/gnu-getopt/bin/getopt "$@"; }
+        else
+            echo >&2 "Need gnu getopt"
+            exit 2
+        fi
+    fi
+
+    # Scan args
+    local LONG_OPTS="help,arch:,distro:"
+    local opts
+    opts=$(getopt -n "$0" -l "$LONG_OPTS" -o +ha:d: -- "$@")
+    eval set -- "$opts"
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        -h|--help) print_help; exit 1 ;;
+        -a|--arch) opt_arch=$2; shift ;;
+        -d|--distro) opt_distro=$2; shift ;;
+        --)
+            shift
+            opt_pkg_list=("$@")
+            break
+            ;;
+        *)
+            echo >&2 "unrecognized argument $1"
+            exit 2
+            ;;
+        esac
+        shift
+    done
+}
+
+
 main()
 {
     local pkg_arg
@@ -41,22 +88,19 @@ main()
     local link_list=()
     local dpkg_list=()
 
-    if [[ $1 == -h || $1 == --help ]]; then
-        print_help
-        exit 2
-    fi
+    parse_args "$@"
 
     tmpdir=$(mktemp -d)
     trap exit_trap EXIT
 
-    for pkg_arg; do
+    for pkg_arg in "${opt_pkg_list[@]}"; do
         local pn pv
         if [[ $pkg_arg != *=* ]]; then
             echo "Bad package argument $pkg_arg needs to be of the form PKG=VER"
         fi
         pn=${pkg_arg%%=*}
         pv=${pkg_arg#*=}
-        link=$(curl -s "https://launchpad.net/ubuntu/focal/amd64/$pn/$pv" | get_librarian_link)
+        link=$(curl -s "https://launchpad.net/ubuntu/$opt_distro/$opt_arch/$pn/$pv" | get_librarian_link)
         if [[ -z $link ]]; then
             echo "FAIL on $pn=$pv"
             exit 1
