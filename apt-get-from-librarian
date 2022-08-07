@@ -109,7 +109,7 @@ main()
     done
     (
         cd "$tmpdir"
-        curl_cmd=(curl -q -Z)
+        curl_cmd=(curl -Z)
         for link in "${link_list[@]}"; do
             curl_cmd+=(-O "$link")
             dpkg_list+=(./"$(basename "$link")")
