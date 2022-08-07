@@ -17,8 +17,8 @@ Usage:
 Options:
 
 -h, --help                  Show this message.
--a, --arch ARCH             Set arch (default $opt_arch)
--d, --distro DISTRO         Set ubuntu distro codename (default $opt_distro)
+-a, --arch ARCH             Set arch (default from \`\`dpkg --print-architecture\`\`).
+-d, --distro DISTRO         Set ubuntu distro codename (default from \`\`/etc/os-release\`\`)
 
 Example:
 
@@ -43,18 +43,9 @@ exit_trap()
 parse_args()
 {
     # Defaults
-    opt_arch=amd64
-    opt_distro=focal
+    opt_arch=
+    opt_distro=
     opt_pkg_list=()
-
-    if [[ $OSTYPE = darwin* ]]; then
-        if [[ -x /usr/local/opt/gnu-getopt/bin/getopt ]]; then
-            getopt() { /usr/local/opt/gnu-getopt/bin/getopt "$@"; }
-        else
-            echo >&2 "Need gnu getopt"
-            exit 2
-        fi
-    fi
 
     # Scan args
     local LONG_OPTS="help,arch:,distro:"
@@ -78,6 +69,18 @@ parse_args()
         esac
         shift
     done
+
+    if [[ -z $opt_distro ]]; then
+        opt_distro=$(get_ubuntu_codename)
+    fi
+    if [[ -z $opt_arch ]]; then
+        opt_arch=$(dpkg --print-architecture)
+    fi
+}
+
+get_ubuntu_codename()
+{
+    cat /etc/os-release|sed -ne 's/VERSION_CODENAME=//p'
 }
 
 curl_supports_parallel()
