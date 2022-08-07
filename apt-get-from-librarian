@@ -80,6 +80,10 @@ parse_args()
     done
 }
 
+curl_supports_parallel()
+{
+    curl --help | grep -q -- --parallel
+}
 
 main()
 {
@@ -109,7 +113,10 @@ main()
     done
     (
         cd "$tmpdir"
-        curl_cmd=(curl -Z)
+        curl_cmd=(curl)
+        if curl_supports_parallel; then
+            curl_cmd+=(--parallel)
+        fi
         for link in "${link_list[@]}"; do
             curl_cmd+=(-O "$link")
             dpkg_list+=(./"$(basename "$link")")
