@@ -1,8 +1,15 @@
-image: ubuntu:20.04
-
-test:
+test-ubuntu-20.04:
+  image: ubuntu:20.04
   before_script:
     - apt-get update
     - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates
   script:
-    - ./test.sh
+    - ./test-inside-ubuntu-20.04.sh
+
+test-ubuntu-18.04:
+  image: ubuntu:18.04
+  before_script:
+    - apt-get update
+    - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates
+  script:
+    - ./test-inside-ubuntu-18.04.sh
