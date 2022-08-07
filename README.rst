@@ -7,6 +7,12 @@ Usage:
 
     # apt-get-from-librarian [<PACKAGE1=VERSION1>...]
 
+Options:
+
+-h, --help                  Show this message.
+-a, --arch ARCH             Set arch (default amd64)
+-d, --distro DISTRO         Set ubuntu distro codename (default focal)
+
 Example:
 
     # apt-get-from-librarian gcc-9=9.3.0-17ubuntu1~20.04 g++-9=9.3.0-17ubuntu1~20.04
