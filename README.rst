@@ -10,8 +10,8 @@ Usage:
 Options:
 
 -h, --help                  Show this message.
--a, --arch ARCH             Set arch (default amd64)
--d, --distro DISTRO         Set ubuntu distro codename (default focal)
+-a, --arch ARCH             Set arch (default from ``dpkg --print-architecture``).
+-d, --distro DISTRO         Set ubuntu distro codename (default from ``/etc/os-release``)
 
 Example:
 
